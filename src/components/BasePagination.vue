@@ -16,7 +16,6 @@
       <a
         class="pagination__link"
         :class="{'pagination__link--current': pageNumber === page }"
-        href="#"
         @click.prevent="paginate(pageNumber)"
       >
         {{ pageNumber }}

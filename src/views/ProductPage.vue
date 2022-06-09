@@ -48,24 +48,13 @@
           {{ productData.title }}
         </h2>
         <div class="item__form">
-          <form class="form" action="#" method="POST">
+          <form class="form" action="#" method="POST" @submit.prevent="addToBasket">
             <div class="item__row item__row--center">
-              <div class="form__counter">
-                <button type="button" aria-label="Убрать один товар">
-                  <svg width="12" height="12" fill="currentColor">
-                    <use xlink:href="../../public/img/svg/sprite.svg#icon-minus"></use>
-                  </svg>
-                </button>
-
-                <input type="text" value="1" name="count">
-
-                <button type="button" aria-label="Добавить один товар">
-                  <svg width="12" height="12" fill="currentColor">
-                    <use xlink:href="../../public/img/svg/sprite.svg#icon-plus"></use>
-                  </svg>
-                </button>
-              </div>
-
+              <ProductCounter
+                v-model:count-change="countAmount"
+                v-model:render-key-change="renderKey"
+                :key="renderKey"
+              />
               <b class="item__price">
                 {{ productData.price }} ₽
               </b>
@@ -96,7 +85,7 @@
                   <select
                     class="form__select"
                     name="category"
-                    v-model="formData.sizeId"
+                    v-model="sizeId"
                   >
                     <option v-for="size in productData.sizes" :key="size.id" :value="size.id">{{ size.title }}</option>
                   </select>
@@ -151,15 +140,17 @@
 
 <script>
 import { API_BASE_URL } from '@/config'
+import ProductCounter from '@/components/ProductCounter.vue'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'ProductPage',
+  components: { ProductCounter },
   data () {
     return {
+      count: 1,
       noFoundPage: 'img/svg/no-photo.svg',
-      formData: {
-        sizeId: this.defaultSize
-      },
+      sizeId: this.defaultSize,
       pickedColorId: null,
       productAmount: 1,
       renderKey: 1,
@@ -176,6 +167,14 @@ export default {
     }
   },
   computed: {
+    countAmount: {
+      get () {
+        return this.count
+      },
+      set (value) {
+        this.count = value < 1 ? 1 : value
+      }
+    },
     defaultSize () {
       return this.productData ? this.productData.sizes[0].id : 'размеров нет'
     },
@@ -203,6 +202,15 @@ export default {
     this.loadProduct()
   },
   methods: {
+    ...mapActions(['addProductToBasket']),
+    addToBasket () {
+      this.addProductToBasket({
+        productId: this.productData.id,
+        quantity: this.countAmount,
+        sizeId: this.sizeId,
+        colorId: this.selectedProduct.color.id
+      })
+    },
     changeImage (colorId) {
       this.pickedColorId = colorId
     },
@@ -213,7 +221,7 @@ export default {
         const response = await this.axios.get(API_BASE_URL + '/api/products/' + this.$route.params.id)
         this.productData = response.data
         this.productLoading = false
-        this.formData.sizeId = this.defaultSize
+        this.sizeId = this.defaultSize
       } catch (error) {
         this.productLoadingFailed = true
         this.productLoading = false
@@ -223,6 +231,9 @@ export default {
 }
 </script>
 <style>
+.form__label--select::after {
+  pointer-events: none;
+}
 .link--btn {
   border-top: none;
   border-left: none;
