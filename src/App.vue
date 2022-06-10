@@ -15,9 +15,10 @@ export default {
   components: { Header, Footer },
   created () {
     this.getAccessKey()
+    this.loadBasket()
   },
   methods: {
-    ...mapActions(['getAccessKey'])
+    ...mapActions(['getAccessKey', 'loadBasket'])
   }
 }
 </script>

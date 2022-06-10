@@ -54,34 +54,22 @@
 </template>
 
 <script>
-import { mapActions } from 'vuex'
+import { mapGetters } from 'vuex'
 import CartItem from '@/components/cart/CartItem'
 
 export default {
   name: 'CartPage',
   components: { CartItem },
-  data () {
-    return {
-      productsData: null
-    }
-  },
-  created () {
-    this.loadBasket().then(() => {
-      this.productsData = this.$store.state.cartProductsData.items
-    })
-  },
   computed: {
+    ...mapGetters(['syncProductBasket']),
     products () {
-      return this.productsData ? this.productsData.map(item => {
+      return this.syncProductBasket ? this.syncProductBasket.map(item => {
         return {
           ...item,
           image: item.color.gallery.map(color => color.file.url).find(el => el)
         }
       }) : []
     }
-  },
-  methods: {
-    ...mapActions(['loadBasket'])
   }
 }
 </script>

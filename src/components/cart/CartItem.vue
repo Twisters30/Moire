@@ -27,7 +27,12 @@
       {{ product.price }} ₽
     </b>
 
-    <button class="product__del button-del" type="button" aria-label="Удалить товар из корзины">
+    <button
+      @click.prevent="deleteProduct(product.id)"
+      class="product__del button-del"
+      type="button"
+      aria-label="Удалить товар из корзины"
+    >
       <svg width="20" height="20" fill="currentColor">
         <use xlink:href="img/svg/sprite.svg#icon-close"></use>
       </svg>
@@ -37,6 +42,7 @@
 
 <script>
 import ProductCounter from '@/components/ProductCounter.vue'
+import { mapActions } from 'vuex'
 
 export default {
   name: 'CartItem',
@@ -54,10 +60,12 @@ export default {
         return this.productAmount
       },
       set (value) {
-        console.log(value)
         this.productAmount = value < 1 ? 1 : value
       }
     }
+  },
+  methods: {
+    ...mapActions(['deleteProduct'])
   },
   created () {
     this.productAmount = this.product.quantity

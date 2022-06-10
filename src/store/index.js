@@ -13,6 +13,17 @@ const store = createStore({
   mutations: {
     updateAccessKey (state, payloadAccessKey) {
       state.userAccessKey = payloadAccessKey
+    },
+    updateProductsData (state, products) {
+      state.cartProductsData = products
+    },
+    updateBasketLocal (state, productId) {
+      state.cartProductsData = state.cartProductsData.filter(item => item.id !== productId)
+    }
+  },
+  getters: {
+    syncProductBasket (state) {
+      return state.cartProductsData
     }
   },
   actions: {
@@ -37,8 +48,7 @@ const store = createStore({
             userAccessKey: context.state.userAccessKey
           }
         })
-        context.state.cartProductsData = await response.data
-        return response.data
+        context.commit('updateProductsData', response.data.items)
       } catch (error) {
         return error.response.data
       }
@@ -57,8 +67,24 @@ const store = createStore({
         })
         context.state.cartProduct = await response.data
       } catch (error) {
-        console.log(error)
+        return error.data
       }
+    },
+    async deleteProduct (context, productId) {
+      context.commit('updateBasketLocal', productId)
+      try {
+        await axios.delete(API_BASE_URL + '/api/baskets/products', {
+          params: {
+            userAccessKey: context.state.userAccessKey
+          },
+          data: {
+            basketItemId: productId
+          }
+        })
+      } catch (error) {
+        return error.data
+      }
+      // context.commit('updateBasket', response.data.items)turn error.data
     }
   }
 })
