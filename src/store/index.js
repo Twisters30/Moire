@@ -5,7 +5,7 @@ import { API_BASE_URL } from '@/config'
 const store = createStore({
   modules: {},
   state: {
-    cartProduct: [],
+    basketProducts: [],
     userAccessKey: null,
     cartProductsData: [],
     orderInfo: null
@@ -14,16 +14,19 @@ const store = createStore({
     updateAccessKey (state, payloadAccessKey) {
       state.userAccessKey = payloadAccessKey
     },
-    updateProductsData (state, products) {
+    updateBasketProductsData (state, products) {
       state.cartProductsData = products
     },
+    updateBasketProducts (state, products) {
+      state.basketProducts = products
+    },
     updateBasketLocal (state, productId) {
-      state.cartProductsData = state.cartProductsData.filter(item => item.id !== productId)
+      state.basketProducts = state.basketProducts.filter(item => item.id !== productId)
     }
   },
   getters: {
-    syncProductBasket (state) {
-      return state.cartProductsData
+    getBasketProduct (state) {
+      return state.basketProducts
     }
   },
   actions: {
@@ -48,9 +51,10 @@ const store = createStore({
             userAccessKey: context.state.userAccessKey
           }
         })
-        context.commit('updateProductsData', response.data.items)
+        context.commit('updateBasketProductsData', response.data.items)
+        context.commit('updateBasketProducts', response.data.items)
       } catch (error) {
-        return error.response.data
+        return error
       }
     },
     async addProductToBasket (context, { productId, quantity, sizeId, colorId }) {
@@ -66,8 +70,25 @@ const store = createStore({
           }
         })
         context.state.cartProduct = await response.data
+        await context.dispatch('loadBasket')
       } catch (error) {
-        return error.data
+        return error.response.data
+      }
+    },
+    async updateBasketProductQuantity (context, { productId, quantity }) {
+      if (quantity < 1) return
+      try {
+        const response = await axios.put(API_BASE_URL + '/api/baskets/products', {
+          basketItemId: productId,
+          quantity: quantity
+        }, {
+          params: {
+            userAccessKey: context.state.userAccessKey
+          }
+        })
+        await context.commit('updateBasketProducts', response.data.items)
+      } catch (error) {
+        return error.response.data
       }
     },
     async deleteProduct (context, productId) {
@@ -82,9 +103,8 @@ const store = createStore({
           }
         })
       } catch (error) {
-        return error.data
+        return error.response.data
       }
-      // context.commit('updateBasket', response.data.items)turn error.data
     }
   }
 })

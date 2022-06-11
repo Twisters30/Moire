@@ -61,9 +61,9 @@ export default {
   name: 'CartPage',
   components: { CartItem },
   computed: {
-    ...mapGetters(['syncProductBasket']),
+    ...mapGetters(['getBasketProduct']),
     products () {
-      return this.syncProductBasket ? this.syncProductBasket.map(item => {
+      return this.getBasketProduct ? this.getBasketProduct.map(item => {
         return {
           ...item,
           image: item.color.gallery.map(color => color.file.url).find(el => el)

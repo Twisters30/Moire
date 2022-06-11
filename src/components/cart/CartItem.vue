@@ -61,11 +61,16 @@ export default {
       },
       set (value) {
         this.productAmount = value < 1 ? 1 : value
+        this.updateBasketProductQuantity(
+          {
+            productId: this.product.id,
+            quantity: value
+          })
       }
     }
   },
   methods: {
-    ...mapActions(['deleteProduct'])
+    ...mapActions(['deleteProduct', 'updateBasketProductQuantity'])
   },
   created () {
     this.productAmount = this.product.quantity
