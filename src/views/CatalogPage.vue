@@ -7,7 +7,7 @@
           Каталог
         </h1>
         <span class="content__info">
-          152 товара
+          {{ countProducts }} товара
         </span>
       </div>
     </div>
@@ -48,6 +48,8 @@ export default {
   components: { ProductItem, BasePagination, ProductFilter },
   data () {
     return {
+      countProducts: 0,
+      noFoundImage: 'img/svg/no-photo.svg',
       colorIdFromFilter: null,
       filters: {
         colorIds: [],
@@ -84,6 +86,7 @@ export default {
   },
   created () {
     this.loadProducts()
+    this.loadProducts(1000)
   },
   computed: {
     countProduct () {
@@ -94,14 +97,19 @@ export default {
         .map((product) => {
           return {
             ...product,
-            image: product.colors[0].gallery ? product.colors[0].gallery[0].file.url : this.noFoundPage,
+            image: product.colors[0].gallery ? product.colors[0].gallery[0].file.url : this.noFoundImage,
             colorId: product.colors[0].color.id
           }
         }) : []
     }
   },
   methods: {
-    async loadProducts () {
+    countAllProduct (products) {
+      return products.reduce((accum, currentCount) => {
+        return accum + currentCount.colors.length
+      }, 0)
+    },
+    loadProducts: async function (allProducts = null) {
       this.productsLoading = true
       this.productsLoadingFailed = false
       clearTimeout(this.loadProductTimer)
@@ -110,7 +118,7 @@ export default {
           const response = await this.axios.get(API_BASE_URL + '/api/products', {
             params: {
               page: this.page,
-              limit: this.productPerPage,
+              limit: allProducts !== null ? allProducts : this.productPerPage,
               categoryId: this.filters.categoryId,
               minPrice: this.filters.priceFrom,
               maxPrice: this.filters.priceTo,
@@ -119,6 +127,9 @@ export default {
               materialIds: this.filters.materialIds
             }
           })
+          if (allProducts) {
+            this.countProducts = await this.countAllProduct(response.data.items)
+          }
           this.productsData = await response.data
           this.productsLoading = false
         } catch (error) {

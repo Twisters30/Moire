@@ -11,7 +11,7 @@
         8 800 600 90 09
       </a>
 
-      <CartIndicator />
+      <CartIndicator :basket-products-quantity="basketProductsQuantity"/>
     </div>
   </header>
 </template>
@@ -21,7 +21,10 @@ import CartIndicator from '@/components/cart/CartIndicator'
 
 export default {
   name: 'Header',
-  components: { CartIndicator }
+  components: { CartIndicator },
+  props: {
+    basketProductsQuantity: { type: [String, Number], default: 0 }
+  }
 }
 </script>
 

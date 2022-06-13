@@ -3,9 +3,9 @@
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="index.html">
+          <router-link class="breadcrumbs__link" :to="{ name: 'catalog' }">
             Каталог
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link" href="#">
@@ -149,7 +149,7 @@ export default {
   data () {
     return {
       count: 1,
-      noFoundPage: 'img/svg/no-photo.svg',
+      noFoundImage: 'img/svg/no-photo.svg',
       sizeId: this.defaultSize,
       pickedColorId: null,
       productAmount: 1,
@@ -182,7 +182,7 @@ export default {
       this.productData.colors.forEach(item => {
         if (!item.gallery) {
           item.gallery = []
-          item.gallery.push({ file: { url: this.noFoundPage } })
+          item.gallery.push({ file: { url: this.noFoundImage } })
         }
       })
       return this.productData ? this.productData.colors

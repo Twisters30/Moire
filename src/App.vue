@@ -1,6 +1,6 @@
 <template>
   <div>
-   <Header />
+   <Header :basket-products-quantity="basketProductsQuantity"/>
     <router-view />
     <Footer />
   </div>
@@ -9,13 +9,16 @@
 <script>
 import Header from '@/components/Header.vue'
 import Footer from '@/components/Footer.vue'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
   components: { Header, Footer },
   created () {
     this.getAccessKey()
     this.loadBasket()
+  },
+  computed: {
+    ...mapGetters(['basketProductsQuantity'])
   },
   methods: {
     ...mapActions(['getAccessKey', 'loadBasket'])

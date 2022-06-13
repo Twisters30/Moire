@@ -3,9 +3,9 @@
     <div class="content__top">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="index.html">
+          <router-link class="breadcrumbs__link" :to="{ name: 'catalog' }">
             Каталог
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
@@ -19,7 +19,7 @@
           Корзина
         </h1>
         <span class="content__info">
-          3 товара
+          {{ basketProductsQuantity }} товара
         </span>
       </div>
     </div>
@@ -41,7 +41,7 @@
             Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
           </p>
           <p class="cart__price">
-            Итого: <span>4 070 ₽</span>
+            Итого: <span>{{ orderPrice }} ₽</span>
           </p>
 
           <button class="cart__button button button--primery" type="submit">
@@ -61,7 +61,7 @@ export default {
   name: 'CartPage',
   components: { CartItem },
   computed: {
-    ...mapGetters(['getBasketProduct']),
+    ...mapGetters(['getBasketProduct', 'basketProductsQuantity', 'orderPrice']),
     products () {
       return this.getBasketProduct ? this.getBasketProduct.map(item => {
         return {

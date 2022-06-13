@@ -46,7 +46,7 @@ export default {
   },
   data () {
     return {
-      noFoundPage: 'img/svg/no-photo.svg',
+      noFoundImage: 'img/svg/no-photo.svg',
       checkedColor: null
     }
   },
@@ -61,7 +61,7 @@ export default {
         if (item.color.id === this.checkedColor) {
           if (!item.gallery) {
             item.gallery = []
-            item.gallery.push({ file: { url: this.noFoundPage } })
+            item.gallery.push({ file: { url: this.noFoundImage } })
           }
           return item.gallery[0].file.url
         }

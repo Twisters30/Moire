@@ -27,6 +27,16 @@ const store = createStore({
   getters: {
     getBasketProduct (state) {
       return state.basketProducts
+    },
+    orderPrice (state) {
+      return state.basketProducts.reduce((accum, currentValue) => {
+        return accum + (currentValue.price * currentValue.quantity)
+      }, 0)
+    },
+    basketProductsQuantity (state) {
+      return state.basketProducts.reduce((accum, currentValue) => {
+        return accum + currentValue.quantity
+      }, 0)
     }
   },
   actions: {

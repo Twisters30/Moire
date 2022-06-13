@@ -107,7 +107,12 @@
       <button class="filter__submit button button--primery" type="submit">
         Применить
       </button>
-      <button class="filter__reset button button--second" type="button" @click="resetFilter">
+      <button
+        class="filter__reset button button--second"
+        type="button"
+        @click="resetFilter"
+        :disabled="!activeBtnReset"
+      >
         Сбросить
       </button>
     </form>
@@ -152,6 +157,14 @@ export default {
     }
   },
   computed: {
+    activeBtnReset () {
+      return Object.values(this.filterParams).some(el => {
+        if (Array.isArray(el)) {
+          return el.length
+        }
+        return el
+      })
+    },
     categories () {
       return this.categoriesData ? this.categoriesData.items : []
     },
