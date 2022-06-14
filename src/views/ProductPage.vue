@@ -201,6 +201,9 @@ export default {
   created () {
     this.loadProduct()
   },
+  beforeRouteUpdate () {
+    this.loadProduct()
+  },
   methods: {
     ...mapActions(['addProductToBasket']),
     addToBasket () {
@@ -230,7 +233,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped lang="scss">
 .form__label--select::after {
   pointer-events: none;
 }
@@ -243,5 +246,12 @@ export default {
 }
 .pics__preview {
   height: 98px;
+}
+.form__select {
+  cursor: pointer;
+  transition: background-color 500ms;
+  &:hover {
+    background-color: #f8f5f5;
+  }
 }
 </style>

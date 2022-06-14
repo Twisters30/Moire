@@ -11,6 +11,10 @@ const store = createStore({
     orderInfo: null
   },
   mutations: {
+    resetBasket (state) {
+      state.basketProducts = []
+      state.cartProductsData = []
+    },
     updateAccessKey (state, payloadAccessKey) {
       state.userAccessKey = payloadAccessKey
     },
@@ -25,6 +29,9 @@ const store = createStore({
     }
   },
   getters: {
+    isHaveProductsInBasket (state) {
+      return state.basketProducts.length
+    },
     getBasketProduct (state) {
       return state.basketProducts
     },

@@ -25,7 +25,7 @@
     </div>
 
     <section class="cart">
-      <form class="cart__form form" action="#" method="POST">
+      <form class="cart__form form" action="#" method="POST" @submit.prevent="createOrder">
         <div class="cart__field">
           <ul class="cart__list">
             <CartItem
@@ -36,7 +36,7 @@
           </ul>
         </div>
 
-        <div class="cart__block">
+        <div class="cart__block" v-if="isHaveProductsInBasket">
           <p class="cart__desc">
             Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
           </p>
@@ -44,9 +44,19 @@
             Итого: <span>{{ orderPrice }} ₽</span>
           </p>
 
-          <button class="cart__button button button--primery" type="submit">
+          <button
+            class="cart__button button button--primery"
+            type="submit"
+          >
             Оформить заказ
           </button>
+        </div>
+        <div class="cart__block text--center" v-else>
+          <router-link
+            class="cart__desc"
+            :to="{ name: 'catalog' }">
+            Добавте товары в корзину
+          </router-link>
         </div>
       </form>
     </section>
@@ -61,7 +71,7 @@ export default {
   name: 'CartPage',
   components: { CartItem },
   computed: {
-    ...mapGetters(['getBasketProduct', 'basketProductsQuantity', 'orderPrice']),
+    ...mapGetters(['getBasketProduct', 'basketProductsQuantity', 'orderPrice', 'isHaveProductsInBasket']),
     products () {
       return this.getBasketProduct ? this.getBasketProduct.map(item => {
         return {
@@ -70,6 +80,17 @@ export default {
         }
       }) : []
     }
+  },
+  methods: {
+    createOrder () {
+      this.$router.push({ name: 'order' })
+    }
   }
 }
 </script>
+<style>
+.text--center {
+  text-align: center;
+  margin-bottom: 0;
+}
+</style>

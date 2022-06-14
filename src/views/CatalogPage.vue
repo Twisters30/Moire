@@ -29,7 +29,7 @@
 
         <BasePagination
           v-model:page="page"
-          :count="countProduct"
+          :count="countProducts"
           :per-page="productPerPage"
         />
       </section>
@@ -48,7 +48,6 @@ export default {
   components: { ProductItem, BasePagination, ProductFilter },
   data () {
     return {
-      countProducts: 0,
       noFoundImage: 'img/svg/no-photo.svg',
       colorIdFromFilter: null,
       filters: {
@@ -89,7 +88,7 @@ export default {
     this.loadProducts(1000)
   },
   computed: {
-    countProduct () {
+    countProducts () {
       return this.productsData ? this.productsData.pagination.total : 0
     },
     products () {
@@ -104,11 +103,6 @@ export default {
     }
   },
   methods: {
-    countAllProduct (products) {
-      return products.reduce((accum, currentCount) => {
-        return accum + currentCount.colors.length
-      }, 0)
-    },
     loadProducts: async function (allProducts = null) {
       this.productsLoading = true
       this.productsLoadingFailed = false
@@ -127,9 +121,6 @@ export default {
               materialIds: this.filters.materialIds
             }
           })
-          if (allProducts) {
-            this.countProducts = await this.countAllProduct(response.data.items)
-          }
           this.productsData = await response.data
           this.productsLoading = false
         } catch (error) {
