@@ -141,7 +141,7 @@
             Оформить заказ
           </button>
         </div>
-        <div class="cart__error form__error-block">
+        <div class="cart__error form__error-block" v-if="isError">
           <h4>Заявка не отправлена!</h4>
           <p>
             Похоже произошла ошибка. Попробуйте отправить снова или перезагрузите страницу.
@@ -176,9 +176,16 @@ export default {
   },
   computed: {
     ...mapState(['userAccessKey']),
-    ...mapGetters(['getBasketProduct', 'basketProductsQuantity', 'orderPrice']),
+    ...mapGetters(['getBasketProduct', 'basketProductsQuantity', 'orderBasketPrice']),
+    orderPrice () {
+      return this.deliveryTypeData ? Number(this.orderBasketPrice) + Number(this.deliveryTypeData
+        .find(type => type.id === this.formData.deliveryTypeId).price) : Number(this.orderBasketPrice)
+    },
     products () {
       return this.getBasketProduct
+    },
+    isError () {
+      return Object.values(this.formError).length > 1
     }
   },
   created () {
@@ -195,6 +202,7 @@ export default {
           }
         })
         this.paymentTypeData = await response.data
+        this.formData.paymentTypeId = await response.data.find(id => id).id
       } catch (error) {
         return error
       }
@@ -203,6 +211,7 @@ export default {
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/deliveries')
         this.deliveryTypeData = await response.data
+        this.formData.deliveryTypeId = await response.data.find(id => id).id
       } catch (error) {
         return error
       }
@@ -210,7 +219,7 @@ export default {
     async sendOrder () {
       this.formError = {}
       try {
-        await this.axios.post(API_BASE_URL + '/api/orders', {
+        const response = await this.axios.post(API_BASE_URL + '/api/orders', {
           ...this.formData
         }, {
           params: {
@@ -218,6 +227,8 @@ export default {
           }
         })
         this.resetBasket()
+        await this.$store.commit('updateOrderInfo', response.data)
+        await this.$router.push({ name: 'orderInfo', params: { id: response.data.id } })
       } catch (error) {
         this.formError = error.response.data.error.request || {}
       }

@@ -41,7 +41,7 @@
             Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
           </p>
           <p class="cart__price">
-            Итого: <span>{{ orderPrice }} ₽</span>
+            Итого: <span>{{ orderBasketPrice }} ₽</span>
           </p>
 
           <button
@@ -71,7 +71,7 @@ export default {
   name: 'CartPage',
   components: { CartItem },
   computed: {
-    ...mapGetters(['getBasketProduct', 'basketProductsQuantity', 'orderPrice', 'isHaveProductsInBasket']),
+    ...mapGetters(['getBasketProduct', 'basketProductsQuantity', 'orderBasketPrice', 'isHaveProductsInBasket']),
     products () {
       return this.getBasketProduct ? this.getBasketProduct.map(item => {
         return {

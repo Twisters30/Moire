@@ -11,6 +11,9 @@ const store = createStore({
     orderInfo: null
   },
   mutations: {
+    updateOrderInfo (state, orderInfo) {
+      state.orderInfo = orderInfo
+    },
     resetBasket (state) {
       state.basketProducts = []
       state.cartProductsData = []
@@ -35,7 +38,7 @@ const store = createStore({
     getBasketProduct (state) {
       return state.basketProducts
     },
-    orderPrice (state) {
+    orderBasketPrice (state) {
       return state.basketProducts.reduce((accum, currentValue) => {
         return accum + (currentValue.price * currentValue.quantity)
       }, 0)
@@ -44,9 +47,25 @@ const store = createStore({
       return state.basketProducts.reduce((accum, currentValue) => {
         return accum + currentValue.quantity
       }, 0)
+    },
+    ordersProductsQuantity (state) {
+      return state.orderInfo.basket.items.reduce((accum, currentValue) => {
+        return accum + currentValue.quantity
+      }, 0)
     }
   },
   actions: {
+    loadOrderInfo (context, orderId) {
+      return axios
+        .get(API_BASE_URL + '/api/orders/' + orderId, {
+          params: {
+            userAccessKey: context.state.userAccessKey
+          }
+        })
+        .then(response => {
+          context.commit('updateOrderInfo', response.data)
+        })
+    },
     async getAccessKey (context) {
       const userAccessKey = localStorage.getItem('userAccessKey')
       if (userAccessKey) {
