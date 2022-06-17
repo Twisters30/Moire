@@ -54,6 +54,12 @@ export default {
       productAmount: null
     }
   },
+  watch: {
+    productAmount (value, prevValue) {
+      if (value === prevValue || prevValue === null) return
+      this.$emit('clickOnCounter', true)
+    }
+  },
   computed: {
     updateProductAmount: {
       get () {

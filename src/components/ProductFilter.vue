@@ -1,6 +1,13 @@
 <template>
   <aside class="filter">
-    <form class="filter__form form" action="#" method="get" @submit.prevent="submitFilter">
+    <BaseLoader width="100" height="100" position="auto" v-if="isLoading" />
+    <form
+      v-else
+      class="filter__form form"
+      action="#"
+      method="get"
+      @submit.prevent="submitFilter"
+    >
       <fieldset class="form__block">
         <legend class="form__legend">Цена</legend>
         <label class="form__label form__label--price">
@@ -74,7 +81,7 @@
               <span class="check-list__desc">
                     {{ material.title }}
                     <span> ({{ material.productsCount }}) </span>
-                  </span>
+              </span>
             </label>
           </li>
         </ul>
@@ -121,12 +128,15 @@
 
 <script>
 import { API_BASE_URL } from '@/config'
+import BaseLoader from '@/components/loader/BaseLoader.vue'
 
 export default {
   name: 'ProductFilter',
   props: ['filtersUpdate'],
+  components: { BaseLoader },
   data () {
     return {
+      isLoading: false,
       filterParams: {
         currentColor: null,
         currentPriceFrom: 0,
@@ -134,6 +144,12 @@ export default {
         currentCategoryId: 0,
         currentMaterial: [],
         currentSeason: []
+      },
+      filterError: {
+        category: false,
+        colors: false,
+        seasons: false,
+        materials: false
       },
       categoriesData: null,
       colorsData: null,
@@ -202,35 +218,43 @@ export default {
         })
     },
     async loadCategories () {
+      this.isLoading = true
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/productCategories')
         this.categoriesData = await response.data
+        this.isLoading = false
       } catch (error) {
-        console.log(error)
+        this.isLoading = false
       }
     },
     async loadColors () {
+      this.isLoading = true
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/colors')
         this.colorsData = await response.data
+        this.isLoading = false
       } catch (error) {
-        console.log(error)
+        this.isLoading = false
       }
     },
     async loadMaterials () {
+      this.isLoading = true
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/materials')
         this.materialsData = await response.data
+        this.isLoading = false
       } catch (error) {
-        console.log(error)
+        this.isLoading = false
       }
     },
     async loadCollections () {
+      this.isLoading = true
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/seasons')
         this.seasonsData = await response.data
+        this.isLoading = false
       } catch (error) {
-        console.log(error)
+        this.isLoading = false
       }
     }
   },

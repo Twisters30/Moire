@@ -17,8 +17,9 @@
         v-model:filters-update="filters"
       />
 
-      <section class="catalog">
-        <ul class="catalog__list" v-if="products">
+      <section class="catalog" v-if="products">
+        <BaseLoader height="100px" width="100px" position="auto auto" v-if="isLoading" />
+        <ul class="catalog__list" v-else>
           <ProductItem
             v-for="product in products"
             :key="product.id"
@@ -26,8 +27,13 @@
             :filter-color-id="colorIdFromFilter"
           />
         </ul>
+        <div v-if="isLoadingFailed">
+          Произошла ошибка!
+          <button @click.prevent="loadProducts">Перезагрузить страницу</button>
+        </div>
 
         <BasePagination
+          v-if="countProducts"
           v-model:page="page"
           :count="countProducts"
           :per-page="productPerPage"
@@ -42,12 +48,15 @@ import ProductFilter from '@/components/ProductFilter.vue'
 import BasePagination from '@/components/BasePagination.vue'
 import { API_BASE_URL } from '@/config'
 import ProductItem from '@/components/ProductItem.vue'
+import BaseLoader from '@/components/loader/BaseLoader.vue'
 
 export default {
   name: 'CatalogPage',
-  components: { ProductItem, BasePagination, ProductFilter },
+  components: { BaseLoader, ProductItem, BasePagination, ProductFilter },
   data () {
     return {
+      isLoading: false,
+      isLoadingFailed: false,
       noFoundImage: 'img/svg/no-photo.svg',
       colorIdFromFilter: null,
       filters: {
@@ -60,8 +69,6 @@ export default {
       },
       productPerPage: 12,
       productsData: null,
-      productsLoading: false,
-      productsLoadingFailed: false,
       page: 1
     }
   },
@@ -85,7 +92,6 @@ export default {
   },
   created () {
     this.loadProducts()
-    this.loadProducts(1000)
   },
   computed: {
     countProducts () {
@@ -103,16 +109,16 @@ export default {
     }
   },
   methods: {
-    loadProducts: async function (allProducts = null) {
-      this.productsLoading = true
-      this.productsLoadingFailed = false
+    async loadProducts () {
+      this.isLoading = true
+      this.isLoadingFailed = false
       clearTimeout(this.loadProductTimer)
       this.loadProductTimer = setTimeout(async () => {
         try {
           const response = await this.axios.get(API_BASE_URL + '/api/products', {
             params: {
               page: this.page,
-              limit: allProducts !== null ? allProducts : this.productPerPage,
+              limit: this.productPerPage,
               categoryId: this.filters.categoryId,
               minPrice: this.filters.priceFrom,
               maxPrice: this.filters.priceTo,
@@ -122,10 +128,10 @@ export default {
             }
           })
           this.productsData = await response.data
-          this.productsLoading = false
+          this.isLoading = false
         } catch (error) {
-          this.productsLoadingFailed = true
-          this.productsLoading = false
+          this.isLoadingFailed = true
+          this.isLoading = false
         }
       }, 0)
     }
