@@ -83,3 +83,8 @@ export default {
   }
 }
 </script>
+<style>
+.colors__value {
+  filter: contrast(86%);
+}
+</style>
