@@ -1,6 +1,6 @@
 <template>
-  <main class="content container" v-if="productData">
-    <div class="content__top">
+  <main class="content container">
+    <div class="content__top" v-if="productData">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
           <router-link class="breadcrumbs__link" :to="{ name: 'catalog' }">
@@ -19,15 +19,15 @@
         </li>
       </ul>
     </div>
-
-    <section class="item" v-if="selectedProduct">
+    <section v-if="productLoading"><BaseLoader width="100" height="100" position="auto"/></section>
+    <section class="item" v-else>
       <div class="item__pics pics">
         <div class="pics__wrapper">
           <img
             width="570"
             height="570"
             :src="selectedProduct.gallery[0].file.url"
-            :alt="product[0].title">
+            :alt="productData.title">
         </div>
         <ul class="pics__list">
           <li class="pics__item" v-for="(image,i) in productData.colors" :key="i">
@@ -35,7 +35,7 @@
               @click.prevent="changeImage(image.color.id)"
               type="button"
                class="pics__link link--btn"
-              :class="{'pics__link--current' : image.gallery[0].file.name === selectedProduct.gallery[0].file.name }">
+              :class="{ 'pics__link--current' : image.gallery[0].file.name === selectedProduct.gallery[0].file.name }">
               <img class="pics__preview" width="98" height="98" :src="image.gallery[0].file.url" :alt="productData.title">
             </button>
           </li>
@@ -56,7 +56,7 @@
                 :key="renderKey"
               />
               <b class="item__price">
-                {{ productData.price }} ₽
+                {{ prettyPrice }} ₽
               </b>
             </div>
 
@@ -93,8 +93,17 @@
               </fieldset>
             </div>
 
-            <button class="item__button button button--primery" type="submit">
-              В корзину
+            <button
+              :disabled="isLoading"
+              class="item__button button button--primery button--height"
+              type="submit">
+              <span v-if="isError">Ошибка</span>
+              <span v-else>
+                <span v-if="isLoading" class="loader">
+                  <BaseLoader height="25" width="25" opacity="1"/>Добавляем товар
+                </span>
+                <span v-else>В корзину</span>
+              </span>
             </button>
           </form>
         </div>
@@ -103,35 +112,32 @@
       <div class="item__desc">
         <ul class="tabs">
           <li class="tabs__item">
-            <a class="tabs__link tabs__link--current">
+            <button
+              type="button"
+              class="tabs__link"
+              :class="{ 'tabs__link--current': tabs.info }"
+              @click="tabSwitch('info')"
+            >
               Информация о товаре
-            </a>
+            </button>
           </li>
           <li class="tabs__item">
-            <a class="tabs__link" href="#">
+            <button
+              type="button"
+              class="tabs__link"
+              :class="{ 'tabs__link--current': tabs.delivery }"
+              @click="tabSwitch('delivery')"
+            >
               Доставка и возврат
-            </a>
+            </button>
           </li>
         </ul>
 
-        <div class="item__content">
-          <h3>Состав:</h3>
-
-          <p>
-            60% хлопок<br>
-            30% полиэстер<br>
-          </p>
-
-          <h3>Уход:</h3>
-
-          <p>
-            Машинная стирка при макс. 30ºC короткий отжим<br>
-            Гладить при макс. 110ºC<br>
-            Не использовать машинную сушку<br>
-            Отбеливать запрещено<br>
-            Не подвергать химчистке<br>
-          </p>
-
+        <div class="item__content" v-if="tabs.info">
+          {{ productData.content }} Информация о товаре....
+        </div>
+        <div class="item__content" v-if="tabs.delivery">
+          Информация о доставке и возврату товара....
         </div>
       </div>
     </section>
@@ -139,15 +145,23 @@
 </template>
 
 <script>
+import numberFormat from '@/helpers/numberFormat'
 import { API_BASE_URL } from '@/config'
 import ProductCounter from '@/components/ProductCounter.vue'
 import { mapActions } from 'vuex'
+import BaseLoader from '@/components/loaders/BaseLoader.vue'
 
 export default {
   name: 'ProductPage',
-  components: { ProductCounter },
+  components: { BaseLoader, ProductCounter },
   data () {
     return {
+      tabs: {
+        info: true,
+        delivery: false
+      },
+      isLoading: false,
+      isError: false,
       count: 1,
       noFoundImage: 'img/svg/no-photo.svg',
       sizeId: this.defaultSize,
@@ -167,6 +181,9 @@ export default {
     }
   },
   computed: {
+    prettyPrice () {
+      return numberFormat(this.productData.price)
+    },
     countAmount: {
       get () {
         return this.count
@@ -187,15 +204,6 @@ export default {
       })
       return this.productData ? this.productData.colors
         .find(item => item.color.id === this.pickedColorId) : {}
-    },
-    product () {
-      return this.productData ? this.productData.colors.map(item => {
-        return {
-          ...this.productData,
-          selectedProduct: item.color.id === this.pickedColorId ? { ...item } : null,
-          image: item.color.id === this.pickedColorId ? item.gallery[0].file.url : null
-        }
-      }) : {}
     }
   },
   created () {
@@ -206,12 +214,31 @@ export default {
   },
   methods: {
     ...mapActions(['addProductToBasket']),
+    tabSwitch (keyTabName) {
+      const keys = Object.keys(this.tabs)
+      keys.forEach(key => {
+        if (key === keyTabName) {
+          this.tabs[key] = true
+        } else {
+          this.tabs[key] = false
+        }
+      })
+    },
     addToBasket () {
+      this.isError = false
+      this.isLoading = true
       this.addProductToBasket({
         productId: this.productData.id,
         quantity: this.countAmount,
         sizeId: this.sizeId,
         colorId: this.selectedProduct.color.id
+      }).then((response) => {
+        if (response) {
+          this.isError = true
+          this.isLoading = false
+          return
+        }
+        this.isLoading = false
       })
     },
     changeImage (colorId) {
@@ -223,8 +250,8 @@ export default {
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/products/' + this.$route.params.id)
         this.productData = response.data
-        this.productLoading = false
         this.sizeId = this.defaultSize
+        this.productLoading = false
       } catch (error) {
         this.productLoadingFailed = true
         this.productLoading = false
@@ -234,6 +261,9 @@ export default {
 }
 </script>
 <style scoped lang="scss">
+.button--height {
+  min-height: 75px;
+}
 .form__label--select::after {
   pointer-events: none;
 }
@@ -253,5 +283,11 @@ export default {
   &:hover {
     background-color: #f8f5f5;
   }
+}
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
 }
 </style>

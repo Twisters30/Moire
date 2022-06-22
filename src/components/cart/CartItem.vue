@@ -24,7 +24,7 @@
     />
 
     <b class="product__price">
-      {{ product.price }} ₽
+      {{ prettyPrice }} ₽
     </b>
 
     <button
@@ -43,6 +43,7 @@
 <script>
 import ProductCounter from '@/components/ProductCounter.vue'
 import { mapActions } from 'vuex'
+import numberFormat from '@/helpers/numberFormat'
 
 export default {
   name: 'CartItem',
@@ -55,12 +56,24 @@ export default {
     }
   },
   watch: {
+    renderKey () {
+      if (this.productAmount === 1) {
+        this.updateBasketProductQuantity(
+          {
+            productId: this.product.id,
+            quantity: this.productAmount
+          })
+      }
+    },
     productAmount (value, prevValue) {
       if (value === prevValue || prevValue === null) return
       this.$emit('clickOnCounter', true)
     }
   },
   computed: {
+    prettyPrice () {
+      return numberFormat(this.product.price)
+    },
     updateProductAmount: {
       get () {
         return this.productAmount

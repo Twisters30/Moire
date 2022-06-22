@@ -14,7 +14,7 @@
     </h3>
 
     <span class="catalog__price">
-      {{ product.price }} ₽
+      {{ prettyPrice }} ₽
     </span>
 
     <ul class="colors colors--black">
@@ -38,6 +38,8 @@
 </template>
 
 <script>
+import numberFormat from '@/helpers/numberFormat'
+
 export default {
   name: 'ProductItem',
   props: {
@@ -56,6 +58,9 @@ export default {
     }
   },
   computed: {
+    prettyPrice () {
+      return numberFormat(this.product.price)
+    },
     currentImage () {
       return this.product ? this.product.colors.find(item => {
         if (item.color.id === this.checkedColor) {

@@ -23,9 +23,14 @@
         </span>
       </div>
     </div>
-
-    <section class="cart" v-if="products">
-      <form class="cart__form form" action="#" method="POST" @submit.prevent="createOrder">
+    <section class="cart">
+      <form
+        v-if="products"
+        class="cart__form form"
+        action="#"
+        method="POST"
+        @submit.prevent="createOrder"
+      >
         <div class="cart__field">
           <ul class="cart__list">
             <CartItem
@@ -42,8 +47,8 @@
             Мы&nbsp;посчитаем стоимость доставки на&nbsp;следующем этапе
           </p>
           <p class="cart__price">
-            <span ref="price" v-if="!isLoadingPrice">Итого: <span>{{ orderBasketPrice }} ₽</span></span>
-            <BaseLoader v-else width="50" :height="getHeightPrice" position="auto" />
+            <span ref="price" v-if="!isLoadingPrice">Итого: <span>{{ prettyPrice }} ₽</span></span>
+            <BaseLoader v-else width="50" :height="getHeightEllPrice" position="auto" />
           </p>
 
           <button
@@ -68,7 +73,8 @@
 <script>
 import { mapGetters } from 'vuex'
 import CartItem from '@/components/cart/CartItem.vue'
-import BaseLoader from '@/components/loader/BaseLoader.vue'
+import BaseLoader from '@/components/loaders/BaseLoader.vue'
+import numberFormat from '@/helpers/numberFormat'
 
 export default {
   name: 'CartPage',
@@ -85,7 +91,10 @@ export default {
   },
   computed: {
     ...mapGetters(['getBasketProduct', 'basketProductsQuantity', 'orderBasketPrice', 'isHaveProductsInBasket']),
-    getHeightPrice () {
+    prettyPrice () {
+      return numberFormat(this.orderBasketPrice)
+    },
+    getHeightEllPrice () {
       return this.$refs.price.offsetHeight
     },
     products () {
@@ -101,8 +110,8 @@ export default {
     createOrder () {
       this.$router.push({ name: 'order' })
     },
-    activeLoader (e) {
-      this.isLoadingPrice = e
+    activeLoader (event) {
+      this.isLoadingPrice = event
     }
   }
 }

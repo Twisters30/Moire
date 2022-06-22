@@ -1,6 +1,8 @@
 <template>
   <div>
-   <Header :basket-products-quantity="basketProductsQuantity"/>
+   <Header
+     :basket-products-quantity="basketProductsQuantity"
+   />
     <router-view />
     <Footer />
   </div>

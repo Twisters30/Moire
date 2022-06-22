@@ -128,7 +128,7 @@
 
 <script>
 import { API_BASE_URL } from '@/config'
-import BaseLoader from '@/components/loader/BaseLoader.vue'
+import BaseLoader from '@/components/loaders/BaseLoader.vue'
 
 export default {
   name: 'ProductFilter',

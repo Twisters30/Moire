@@ -11,7 +11,9 @@
         8 800 600 90 09
       </a>
 
-      <CartIndicator :basket-products-quantity="basketProductsQuantity"/>
+      <CartIndicator
+        :basket-products-quantity="basketProductsQuantity"
+      />
     </div>
   </header>
 </template>

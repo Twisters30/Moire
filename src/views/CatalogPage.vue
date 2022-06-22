@@ -48,7 +48,7 @@ import ProductFilter from '@/components/ProductFilter.vue'
 import BasePagination from '@/components/BasePagination.vue'
 import { API_BASE_URL } from '@/config'
 import ProductItem from '@/components/ProductItem.vue'
-import BaseLoader from '@/components/loader/BaseLoader.vue'
+import BaseLoader from '@/components/loaders/BaseLoader.vue'
 
 export default {
   name: 'CatalogPage',

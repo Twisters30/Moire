@@ -94,7 +94,7 @@
                     :value="deliveryType.id"
                   >
                   <span class="options__value">
-                    {{ deliveryType.title }} <b>{{ deliveryType.price }} ₽</b>
+                    {{ deliveryType.title }} <b>{{ prettyPrice(deliveryType.price) }} ₽</b>
                   </span>
                 </label>
               </li>
@@ -127,18 +127,22 @@
               class="cart__order"
             >
               <h3>{{ product.product.title }}</h3>
-              <b>{{ product.price }} ₽</b>
+              <b>{{ prettyPrice(product.price) }} ₽</b>
               <span>Артикул: {{ product.id }}</span>
             </li>
           </ul>
 
           <div class="cart__total">
             <p>Доставка: <b>бесплатно</b></p>
-            <p>Итого: <b>{{ basketProductsQuantity }}</b> товара на сумму <b>{{ orderPrice }} ₽</b></p>
+            <p>Итого: <b>{{ basketProductsQuantity }}</b> товара на сумму <b>{{ prettyPrice(this.orderPrice) }} ₽</b></p>
           </div>
 
-          <button class="cart__button button button--primery" type="submit">
-            Оформить заказ
+          <button class="cart__button button button--primery" type="submit" :disabled="isSendingOrder">
+            <span class="cart__loader-btn" v-if="isSendingOrder">
+              <BaseLoader width="25" height="17" color="white"/>
+              Оформляем...
+            </span>
+            <span v-else>Оформить заказ</span>
           </button>
         </div>
         <div class="cart__error form__error-block" v-if="isError">
@@ -155,11 +159,15 @@
 <script>
 import { mapGetters, mapState, mapMutations } from 'vuex'
 import { API_BASE_URL } from '@/config'
+import BaseLoader from '@/components/loaders/BaseLoader'
+import numberFormat from '@/helpers/numberFormat'
 
 export default {
   name: 'OrderPage',
+  components: { BaseLoader },
   data () {
     return {
+      isSendingOrder: false,
       formData: {
         deliveryTypeId: 1,
         paymentTypeId: 1
@@ -194,6 +202,9 @@ export default {
   },
   methods: {
     ...mapMutations(['resetBasket']),
+    prettyPrice (price) {
+      return numberFormat(price)
+    },
     async getPaymentOptions (deliveryTypeId) {
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/payments', {
@@ -218,6 +229,7 @@ export default {
     },
     async sendOrder () {
       this.formError = {}
+      this.isSendingOrder = true
       try {
         const response = await this.axios.post(API_BASE_URL + '/api/orders', {
           ...this.formData
@@ -231,8 +243,18 @@ export default {
         await this.$router.push({ name: 'orderInfo', params: { id: response.data.id } })
       } catch (error) {
         this.formError = error.response.data.error.request || {}
+      } finally {
+        this.isSendingOrder = false
       }
     }
   }
 }
 </script>
+<style lang="scss">
+.cart {
+  &__loader-btn {
+    display: flex;
+    justify-content: center;
+  }
+}
+</style>
