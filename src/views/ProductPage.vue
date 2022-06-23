@@ -114,7 +114,7 @@
           <li class="tabs__item">
             <button
               type="button"
-              class="tabs__link"
+              class="tabs__link btn--reset"
               :class="{ 'tabs__link--current': tabs.info }"
               @click="tabSwitch('info')"
             >
@@ -124,7 +124,7 @@
           <li class="tabs__item">
             <button
               type="button"
-              class="tabs__link"
+              class="tabs__link btn--reset"
               :class="{ 'tabs__link--current': tabs.delivery }"
               @click="tabSwitch('delivery')"
             >
@@ -289,5 +289,9 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-size: 13px;
+}
+.btn--reset {
+  background-color: transparent;
+  border: none;
 }
 </style>
