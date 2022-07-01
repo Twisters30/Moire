@@ -2,7 +2,7 @@
   <li class="catalog__item">
     <router-link class="catalog__pic" :to="{ name: 'product' , params: { id: product.id }}">
       <img
-        :src="currentImage ? currentImage.gallery[0].file.url : product.image"
+        :src="currentImage"
         :alt="product.title"
       >
     </router-link>
@@ -61,16 +61,11 @@ export default {
     prettyPrice () {
       return numberFormat(this.product.price)
     },
+    currentColor () {
+      return this.product.colors.find(c => c.color.id === this.checkedColor)
+    },
     currentImage () {
-      return this.product ? this.product.colors.find(item => {
-        if (item.color.id === this.checkedColor) {
-          if (!item.gallery) {
-            item.gallery = []
-            item.gallery.push({ file: { url: this.noFoundImage } })
-          }
-          return item.gallery[0].file.url
-        }
-      }) : {}
+      return (this.currentColor && this.currentColor.gallery && this.currentColor.gallery[0].file.url) || this.noFoundImage
     }
   },
   created () {

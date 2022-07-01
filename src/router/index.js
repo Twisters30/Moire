@@ -9,6 +9,7 @@ import config from '../../vue.config'
 
 const routes = [
   { path: '/', redirect: '/catalog' },
+  { path: '/catalog/:id', name: 'catalog', component: CatalogPage },
   { path: '/catalog', name: 'catalog', component: CatalogPage },
   { path: '/:catchAll(.*)', name: 'notFoundPage', component: NotFoundPage },
   { path: '/cart', name: 'cart', component: CartPage },

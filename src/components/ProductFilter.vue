@@ -178,6 +178,9 @@ export default {
         if (Array.isArray(el)) {
           return el.length
         }
+        if (this.$route.params.categoryId) {
+          return true
+        }
         return el
       })
     },
@@ -216,6 +219,7 @@ export default {
           seasonIds: [],
           materialIds: []
         })
+      this.$route.params.categoryId = null
     },
     async loadCategories () {
       this.isLoading = true

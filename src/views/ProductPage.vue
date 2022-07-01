@@ -8,9 +8,9 @@
           </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link" href="#">
+          <router-link class="breadcrumbs__link" :to="{ name: 'catalog', params: { categoryId: productData.category.id }}">
             {{ productData.category.title }}
-          </a>
+          </router-link>
         </li>
         <li class="breadcrumbs__item">
           <a class="breadcrumbs__link">
@@ -109,37 +109,7 @@
         </div>
       </div>
 
-      <div class="item__desc">
-        <ul class="tabs">
-          <li class="tabs__item">
-            <button
-              type="button"
-              class="tabs__link btn--reset"
-              :class="{ 'tabs__link--current': tabs.info }"
-              @click="tabSwitch('info')"
-            >
-              Информация о товаре
-            </button>
-          </li>
-          <li class="tabs__item">
-            <button
-              type="button"
-              class="tabs__link btn--reset"
-              :class="{ 'tabs__link--current': tabs.delivery }"
-              @click="tabSwitch('delivery')"
-            >
-              Доставка и возврат
-            </button>
-          </li>
-        </ul>
-
-        <div class="item__content" v-if="tabs.info">
-          {{ productData.content }} Информация о товаре....
-        </div>
-        <div class="item__content" v-if="tabs.delivery">
-          Информация о доставке и возврату товара....
-        </div>
-      </div>
+      <ProductDescriptionTabs :tab-data="tabs" :productData="productData" />
     </section>
   </main>
 </template>
@@ -150,16 +120,23 @@ import { API_BASE_URL } from '@/config'
 import ProductCounter from '@/components/ProductCounter.vue'
 import { mapActions } from 'vuex'
 import BaseLoader from '@/components/loaders/BaseLoader.vue'
+import ProductDescriptionTabs from '@/components/tabs/ProductDescriptionTabs.vue'
 
 export default {
   name: 'ProductPage',
-  components: { BaseLoader, ProductCounter },
+  components: { ProductDescriptionTabs, BaseLoader, ProductCounter },
   data () {
     return {
-      tabs: {
-        info: true,
-        delivery: false
-      },
+      tabs: [
+        {
+          name: 'Info',
+          title: 'Информация о товаре'
+        },
+        {
+          name: 'DeliveryRefaund',
+          title: 'Доставка и возврат'
+        }
+      ],
       isLoading: false,
       isError: false,
       count: 1,
@@ -214,16 +191,6 @@ export default {
   },
   methods: {
     ...mapActions(['addProductToBasket']),
-    tabSwitch (keyTabName) {
-      const keys = Object.keys(this.tabs)
-      keys.forEach(key => {
-        if (key === keyTabName) {
-          this.tabs[key] = true
-        } else {
-          this.tabs[key] = false
-        }
-      })
-    },
     addToBasket () {
       this.isError = false
       this.isLoading = true
@@ -289,9 +256,5 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-size: 13px;
-}
-.btn--reset {
-  background-color: transparent;
-  border: none;
 }
 </style>

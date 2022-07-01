@@ -55,6 +55,7 @@ export default {
   components: { BaseLoader, ProductItem, BasePagination, ProductFilter },
   data () {
     return {
+      currentProductColor: null,
       isLoading: false,
       isLoadingFailed: false,
       noFoundImage: 'img/svg/no-photo.svg',
@@ -119,7 +120,7 @@ export default {
             params: {
               page: this.page,
               limit: this.productPerPage,
-              categoryId: this.filters.categoryId,
+              categoryId: this.$route.params.categoryId ? this.$route.params.categoryId : this.filters.categoryId,
               minPrice: this.filters.priceFrom,
               maxPrice: this.filters.priceTo,
               colorIds: this.filters.colorIds,
