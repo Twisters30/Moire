@@ -8,7 +8,12 @@
           </router-link>
         </li>
         <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'catalog', params: { categoryId: productData.category.id }}">
+          <router-link
+            class="breadcrumbs__link"
+            :to="{
+            name: 'catalog',
+            params: { categoryId: productData.category.id }
+          }">
             {{ productData.category.title }}
           </router-link>
         </li>
@@ -26,7 +31,7 @@
           <img
             width="570"
             height="570"
-            :src="selectedProduct.gallery[0].file.url"
+            :src="selectedProduct"
             :alt="productData.title">
         </div>
         <ul class="pics__list">
@@ -35,7 +40,7 @@
               @click.prevent="changeImage(image.color.id)"
               type="button"
                class="pics__link link--btn"
-              :class="{ 'pics__link--current' : image.gallery[0].file.name === selectedProduct.gallery[0].file.name }">
+              :class="{ 'pics__link--current': image.gallery[0].file.url === selectedProduct }">
               <img class="pics__preview" width="98" height="98" :src="image.gallery[0].file.url" :alt="productData.title">
             </button>
           </li>
@@ -92,7 +97,6 @@
                 </label>
               </fieldset>
             </div>
-
             <button
               :disabled="isLoading"
               class="item__button button button--primery button--height"
@@ -108,7 +112,6 @@
           </form>
         </div>
       </div>
-
       <ProductDescriptionTabs :tab-data="tabs" :productData="productData" />
     </section>
   </main>
@@ -125,6 +128,7 @@ import ProductDescriptionTabs from '@/components/tabs/ProductDescriptionTabs.vue
 export default {
   name: 'ProductPage',
   components: { ProductDescriptionTabs, BaseLoader, ProductCounter },
+  props: ['colorId'],
   data () {
     return {
       tabs: [
@@ -152,11 +156,6 @@ export default {
       productAddSending: false
     }
   },
-  watch: {
-    productData () {
-      this.pickedColorId = this.productData.colors[0].color.id
-    }
-  },
   computed: {
     prettyPrice () {
       return numberFormat(this.productData.price)
@@ -173,14 +172,8 @@ export default {
       return this.productData ? this.productData.sizes[0].id : 'размеров нет'
     },
     selectedProduct () {
-      this.productData.colors.forEach(item => {
-        if (!item.gallery) {
-          item.gallery = []
-          item.gallery.push({ file: { url: this.noFoundImage } })
-        }
-      })
-      return this.productData ? this.productData.colors
-        .find(item => item.color.id === this.pickedColorId) : {}
+      return this.productData.colors
+        .find(item => item.color.id === Number(this.pickedColorId))?.gallery.find(el => el).file.url
     }
   },
   created () {
@@ -198,7 +191,7 @@ export default {
         productId: this.productData.id,
         quantity: this.countAmount,
         sizeId: this.sizeId,
-        colorId: this.selectedProduct.color.id
+        colorId: this.pickedColorId
       }).then((response) => {
         if (response) {
           this.isError = true
@@ -216,8 +209,9 @@ export default {
       this.productLoadingFailed = false
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/products/' + this.$route.params.id)
-        this.productData = response.data
+        this.productData = await response.data
         this.sizeId = this.defaultSize
+        this.pickedColorId = this.colorId ? this.colorId : this.productData.colors[0].color.id
         this.productLoading = false
       } catch (error) {
         this.productLoadingFailed = true

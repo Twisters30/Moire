@@ -24,7 +24,7 @@
             v-for="product in products"
             :key="product.id"
             :product="product"
-            :filter-color-id="colorIdFromFilter"
+            :filter-colors-id="colorIdFromFilter"
           />
         </ul>
         <div v-if="isLoadingFailed">
@@ -59,7 +59,7 @@ export default {
       isLoading: false,
       isLoadingFailed: false,
       noFoundImage: 'img/svg/no-photo.svg',
-      colorIdFromFilter: null,
+      colorIdFromFilter: [],
       filters: {
         colorIds: [],
         seasonIds: [],
@@ -80,13 +80,7 @@ export default {
     filters: {
       handler () {
         this.loadProducts()
-        if (this.filters.colorIds) {
-          if (Array.isArray(this.filters.colorIds)) {
-            this.colorIdFromFilter = this.filters.colorIds[0]
-          } else {
-            this.colorIdFromFilter = this.filters.colorIds
-          }
-        }
+        this.colorIdFromFilter = this.filters.colorIds
       },
       deep: true
     }

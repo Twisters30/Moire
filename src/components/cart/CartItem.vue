@@ -79,12 +79,15 @@ export default {
         return this.productAmount
       },
       set (value) {
+        if (value) {
+          console.log(value)
+          this.updateBasketProductQuantity(
+            {
+              productId: this.product.id,
+              quantity: value
+            })
+        }
         this.productAmount = value < 1 ? 1 : value
-        this.updateBasketProductQuantity(
-          {
-            productId: this.product.id,
-            quantity: value
-          })
       }
     }
   },

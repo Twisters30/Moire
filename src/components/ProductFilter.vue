@@ -58,9 +58,9 @@
             <label class="colors__label">
               <input
                 class="colors__radio sr-only"
-                type="radio"
+                type="checkbox"
                 :value="color.id"
-                v-model="filterParams.currentColor"
+                v-model="filterParams.currentColors"
               >
               <span class="colors__value" :style="{ 'background-color': color.code }"></span>
             </label>
@@ -138,7 +138,7 @@ export default {
     return {
       isLoading: false,
       filterParams: {
-        currentColor: null,
+        currentColors: [],
         currentPriceFrom: 0,
         currentPriceTo: 0,
         currentCategoryId: 0,
@@ -161,7 +161,7 @@ export default {
     filtersUpdate: {
       handler () {
         this.filterParams = {
-          currentColor: this.filtersUpdate.colorIds,
+          currentColors: this.filtersUpdate.colorIds,
           currentPriceFrom: this.filtersUpdate.priceFrom,
           currentPriceTo: this.filtersUpdate.priceTo,
           currentCategoryId: this.filtersUpdate.categoryId,
@@ -204,7 +204,7 @@ export default {
           priceFrom: this.filterParams.currentPriceFrom,
           priceTo: this.filterParams.currentPriceTo,
           categoryId: this.filterParams.currentCategoryId,
-          colorIds: this.filterParams.currentColor,
+          colorIds: this.filterParams.currentColors,
           seasonIds: this.filterParams.currentSeason,
           materialIds: this.filterParams.currentMaterial
         })

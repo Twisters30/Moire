@@ -13,7 +13,7 @@ const routes = [
   { path: '/catalog', name: 'catalog', component: CatalogPage },
   { path: '/:catchAll(.*)', name: 'notFoundPage', component: NotFoundPage },
   { path: '/cart', name: 'cart', component: CartPage },
-  { path: '/product/:id', name: 'product', component: ProductPage },
+  { path: '/product/:id', name: 'product', component: ProductPage, props: true },
   { path: '/order', name: 'order', component: OrderPage },
   { path: '/order/:id', name: 'orderInfo', component: OrderInfoPage }
 ]

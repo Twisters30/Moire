@@ -127,6 +127,7 @@ const store = createStore({
       return isError
     },
     async updateBasketProductQuantity (context, { productId, quantity }) {
+      // console.log(quantity)
       if (quantity < 1) return
       try {
         const response = await axios.put(API_BASE_URL + '/api/baskets/products', {

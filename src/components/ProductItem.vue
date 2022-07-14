@@ -1,6 +1,12 @@
 <template>
   <li class="catalog__item">
-    <router-link class="catalog__pic" :to="{ name: 'product' , params: { id: product.id }}">
+    <router-link
+      class="catalog__pic"
+      :to="{
+      name: 'product',
+      params: { id: product.id, colorId: checkedColor }
+      }
+      ">
       <img
         :src="currentImage"
         :alt="product.title"
@@ -44,7 +50,7 @@ export default {
   name: 'ProductItem',
   props: {
     product: { type: Object, default: () => {} },
-    filterColorId: { type: Number, default: null }
+    filterColorsId: { type: Array, default: () => [] }
   },
   data () {
     return {
@@ -53,8 +59,14 @@ export default {
     }
   },
   watch: {
-    filterColorId (colorId) {
-      this.checkedColor = !colorId ? this.product.colors.find(el => el).color.id : colorId
+    filterColorsId: {
+      handler (value) {
+        this.checkedColor = !value.length ? this.product.colors.find(el => el).color.id : this.filterColorsId.find(id =>
+          this.product.colors.find(el => {
+            return el.color.id === id
+          }))
+      },
+      immediate: true
     }
   },
   computed: {
@@ -66,14 +78,6 @@ export default {
     },
     currentImage () {
       return (this.currentColor && this.currentColor.gallery && this.currentColor.gallery[0].file.url) || this.noFoundImage
-    }
-  },
-  created () {
-    this.setDefaultColor()
-  },
-  methods: {
-    setDefaultColor () {
-      this.checkedColor = this.filterColorId ? this.filterColorId : this.product.colors.find(el => el).color.id
     }
   }
 }
