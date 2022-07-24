@@ -52,22 +52,7 @@ export default {
   data () {
     return {
       renderKey: 1,
-      productAmount: null
-    }
-  },
-  watch: {
-    renderKey () {
-      if (this.productAmount === 1) {
-        this.updateBasketProductQuantity(
-          {
-            productId: this.product.id,
-            quantity: this.productAmount
-          })
-      }
-    },
-    productAmount (value, prevValue) {
-      if (value === prevValue || prevValue === null) return
-      this.$emit('clickOnCounter', true)
+      productAmount: this.product.quantity
     }
   },
   computed: {
@@ -79,27 +64,18 @@ export default {
         return this.productAmount
       },
       set (value) {
-        if (value) {
-          console.log(value)
-          this.updateBasketProductQuantity(
-            {
-              productId: this.product.id,
-              quantity: value
-            })
-        }
-        this.productAmount = value < 1 ? 1 : value
+        if (!value) return
+        this.productAmount = value
+        this.updateBasketProductQuantity(
+          {
+            productId: this.product.id,
+            quantity: this.productAmount
+          })
       }
     }
   },
   methods: {
     ...mapActions(['deleteProduct', 'updateBasketProductQuantity'])
-  },
-  created () {
-    this.productAmount = this.product.quantity
   }
 }
 </script>
-
-<style scoped>
-
-</style>
