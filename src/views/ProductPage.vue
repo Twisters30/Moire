@@ -1,5 +1,5 @@
 <template>
-  <main class="content container">
+  <main class="content container" v-if="!isError">
     <div class="content__top" v-if="productData">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -115,6 +115,9 @@
       <ProductDescriptionTabs :tab-data="tabs" :productData="productData" />
     </section>
   </main>
+  <main class="content container" v-else>
+    <h2 class="error">{{ isError }}</h2>
+  </main>
 </template>
 
 <script>
@@ -178,10 +181,11 @@ export default {
   },
   created () {
     this.loadProduct()
+    console.log(this.$route.params.id)
   },
-  beforeRouteUpdate () {
-    this.loadProduct()
-  },
+  // beforeRouteUpdate () {
+  //   this.loadProduct()
+  // },
   methods: {
     ...mapActions(['addProductToBasket']),
     addToBasket () {
@@ -207,6 +211,7 @@ export default {
     async loadProduct () {
       this.productLoading = true
       this.productLoadingFailed = false
+      this.isError = false
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/products/' + this.$route.params.id)
         this.productData = await response.data
@@ -214,6 +219,7 @@ export default {
         this.pickedColorId = this.colorId ? this.colorId : this.productData.colors[0].color.id
         this.productLoading = false
       } catch (error) {
+        this.isError = error.response.data.error.message
         this.productLoadingFailed = true
         this.productLoading = false
       }
@@ -250,5 +256,8 @@ export default {
   align-items: center;
   justify-content: space-between;
   font-size: 13px;
+}
+.error {
+  text-align: center;
 }
 </style>

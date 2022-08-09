@@ -5,24 +5,6 @@
   <div class="content container" v-if="errorMessage">{{ errorMessage }}</div>
   <main v-else class="content container">
     <div class="content__top" v-if="order">
-      <ul class="breadcrumbs">
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'catalog' }">
-            Каталог
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <router-link class="breadcrumbs__link" :to="{ name: 'cart' }">
-            Корзина
-          </router-link>
-        </li>
-        <li class="breadcrumbs__item">
-          <a class="breadcrumbs__link">
-            Оформление заказа
-          </a>
-        </li>
-      </ul>
-
       <h1 class="content__title">
         Заказ оформлен <span>№ {{ order.id }}</span>
       </h1>
@@ -119,6 +101,10 @@ export default {
   },
   created () {
     this.getOrderInfo()
+  },
+  beforeUpdate () {
+    // починить ввод вручную order id
+    // this.getOrderInfo()
   },
   computed: {
     ...mapState(['orderInfo']),
