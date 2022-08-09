@@ -1,5 +1,5 @@
 <template>
-  <main class="content container" v-if="!isError">
+  <main class="content container" v-if="!errorMessage">
     <div class="content__top" v-if="productData">
       <ul class="breadcrumbs">
         <li class="breadcrumbs__item">
@@ -116,7 +116,7 @@
     </section>
   </main>
   <main class="content container" v-else>
-    <h2 class="error">{{ isError }}</h2>
+    <h2 class="error">{{ errorMessage }}</h2>
   </main>
 </template>
 
@@ -145,7 +145,7 @@ export default {
         }
       ],
       isLoading: false,
-      isError: false,
+      errorMessage: null,
       count: 1,
       noFoundImage: 'img/svg/no-photo.svg',
       sizeId: this.defaultSize,
@@ -157,6 +157,15 @@ export default {
       productLoadingFailed: false,
       productAdded: false,
       productAddSending: false
+    }
+  },
+  watch: {
+    '$route.params.id': {
+      handler () {
+        this.loadProduct()
+      },
+      deep: true,
+      immediate: true
     }
   },
   computed: {
@@ -179,13 +188,6 @@ export default {
         .find(item => item.color.id === Number(this.pickedColorId))?.gallery.find(el => el).file.url
     }
   },
-  created () {
-    this.loadProduct()
-    console.log(this.$route.params.id)
-  },
-  // beforeRouteUpdate () {
-  //   this.loadProduct()
-  // },
   methods: {
     ...mapActions(['addProductToBasket']),
     addToBasket () {
@@ -209,9 +211,11 @@ export default {
       this.pickedColorId = colorId
     },
     async loadProduct () {
+      if (!this.$route.params.id) return
       this.productLoading = true
       this.productLoadingFailed = false
       this.isError = false
+      this.errorMessage = null
       try {
         const response = await this.axios.get(API_BASE_URL + '/api/products/' + this.$route.params.id)
         this.productData = await response.data
@@ -219,7 +223,7 @@ export default {
         this.pickedColorId = this.colorId ? this.colorId : this.productData.colors[0].color.id
         this.productLoading = false
       } catch (error) {
-        this.isError = error.response.data.error.message
+        this.errorMessage = error.response.data.error.message
         this.productLoadingFailed = true
         this.productLoading = false
       }

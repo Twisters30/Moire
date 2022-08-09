@@ -2,7 +2,7 @@
   <main class="content container" v-if="isOrderInfoLoading">
     <BaseLoader width="100" height="100" position="auto"/>
   </main>
-  <div class="content container" v-if="errorMessage">{{ errorMessage }}</div>
+  <h2 class="content container error" v-if="errorMessage">{{ errorMessage }}</h2>
   <main v-else class="content container">
     <div class="content__top" v-if="order">
       <h1 class="content__title">
@@ -99,12 +99,14 @@ export default {
       isOrderInfoLoading: false
     }
   },
-  created () {
-    this.getOrderInfo()
-  },
-  beforeUpdate () {
-    // починить ввод вручную order id
-    // this.getOrderInfo()
+  watch: {
+    '$route.params.id': {
+      handler () {
+        this.getOrderInfo()
+      },
+      deep: true,
+      immediate: true
+    }
   },
   computed: {
     ...mapState(['orderInfo']),
@@ -125,7 +127,9 @@ export default {
       return numberFormat(price)
     },
     getOrderInfo () {
+      if (!this.$route.params.id) return
       this.isOrderInfoLoading = true
+      this.errorMessage = null
       this.loadOrderInfo(this.$route.params.id)
         .then((error) => {
           if (error) {
@@ -137,3 +141,8 @@ export default {
   }
 }
 </script>
+<style>
+.error {
+  text-align: center;
+}
+</style>
